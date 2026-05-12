@@ -324,17 +324,7 @@
                        required>
             </div>
 
-            <!-- PHONE -->
-            <div class="mb-3">
-                <label class="form-label">
-                    Phone Number
-                </label>
-
-                <input type="text"
-                       class="form-control"
-                       name="phone"
-                       placeholder="+92 300 1234567">
-            </div>
+           
 
             <!-- PASSWORD -->
             <div class="mb-3">

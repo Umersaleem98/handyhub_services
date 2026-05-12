@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Models\Notification;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -10,21 +11,11 @@ use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
 {
-    /*
-    |--------------------------------------------------------------------------
-    | LOGIN SCREEN
-    |--------------------------------------------------------------------------
-    */
     public function LoginScreen()
     {
         return view('pages.auth.login');
     }
 
-    /*
-    |--------------------------------------------------------------------------
-    | LOGIN FUNCTION
-    |--------------------------------------------------------------------------
-    */
     public function login(Request $request)
     {
         // VALIDATION
@@ -60,35 +51,48 @@ class AuthController extends Controller
         ])->withInput();
     }
 
-     // REGISTER SCREEN
+    // REGISTER SCREEN
     public function RegisterScreen()
     {
         return view('pages.auth.register');
     }
 
-    // STORE REGISTER
     public function Register(Request $request)
     {
+        /**
+         * VALIDATION
+         */
         $request->validate([
+
             'name' => 'required|string|max:255',
+
             'email' => 'required|email|unique:users,email',
+
             'password' => 'required|confirmed|min:6',
+
             'role' => 'required|in:seeker,provider',
         ]);
 
+        /**
+         * CREATE USER
+         */
         $user = User::create([
+
             'name' => $request->name,
+
             'email' => $request->email,
-            'phone' => $request->phone,
+
             'role' => $request->role,
+
             'password' => Hash::make($request->password),
         ]);
 
-        // AUTO LOGIN
+      
         Auth::login($user);
 
-        // REDIRECT TO DASHBOARD
-        return redirect()->route('dashboard')
+    
+        return redirect()
+            ->route('login')
             ->with('success', 'Account created successfully');
     }
 

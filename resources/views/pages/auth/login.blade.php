@@ -18,9 +18,8 @@
     <style>
 
         :root {
-            --primary-color: #0d6efd;
-            --secondary-color: #f8f9fa;
-            --dark-color: #1f2937;
+            --primary-color:#ff6b00;
+            --secondary-color:#1a1a2e;
         }
 
         * {
@@ -81,8 +80,8 @@
 
         /* LEFT SIDE */
         .login-branding {
-            background: linear-gradient(135deg, #0d6efd, #4f46e5);
-            color: white;
+            --primary-color:#ff6b00;
+            --secondary-color:#1a1a2e; color: white;
             padding: 60px;
             display: flex;
             flex-direction: column;
