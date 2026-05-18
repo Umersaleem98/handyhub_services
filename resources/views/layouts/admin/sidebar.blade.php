@@ -1,274 +1,195 @@
 <!-- Sidebar -->
 <aside class="sidebar" id="sidebar">
 
-    @php
+@php
 
-        $user = auth()->user();
+    $user = auth()->user();
 
-        /*
-        |--------------------------------------------------------------------------
-        | SEEKER PROFILE CHECK
-        |--------------------------------------------------------------------------
-        */
-        $seekerProfile = $user->seekerProfile ?? null;
+    /*
+    |--------------------------------------------------------------------------
+    | PROFILE CHECKS
+    |--------------------------------------------------------------------------
+    */
+    $seekerProfile = $user->seekerProfile ?? null;
+    $providerProfile = $user->providerProfile ?? null;
 
-        $seekerCompleted =
-            $seekerProfile &&
-            $seekerProfile->profile_completion >= 85;
+    $seekerCompleted = $seekerProfile && $seekerProfile->profile_completion >= 85;
+    $providerCompleted = $providerProfile && $providerProfile->profile_completion >= 85;
 
-        /*
-        |--------------------------------------------------------------------------
-        | PROVIDER PROFILE CHECK
-        |--------------------------------------------------------------------------
-        */
-        $providerProfile = $user->providerProfile ?? null;
+@endphp
 
-        $providerCompleted =
-            $providerProfile &&
-            $providerProfile->profile_completion >= 85;
+<!-- HEADER -->
+<div class="sidebar-header">
 
-    @endphp
-
-
-    <!-- HEADER -->
-    <div class="sidebar-header">
-
-        <div class="brand">
-            <i class="fas fa-tools me-2"></i>
-            FixIt Pro
-        </div>
-
-        <button class="sidebar-toggle" onclick="toggleSidebar()">
-            <i class="fas fa-bars"></i>
-        </button>
-
+    <div class="brand">
+        <i class="fas fa-tools me-2"></i>
+        FixIt Pro
     </div>
 
+    <button class="sidebar-toggle" onclick="toggleSidebar()">
+        <i class="fas fa-bars"></i>
+    </button>
 
+</div>
 
+<!-- NAV -->
+<ul class="nav-menu">
 
+    {{-- DASHBOARD --}}
+    <li class="nav-item">
 
-    <!-- NAV -->
-    <ul class="nav-menu">
+        <a href="{{ url('dashboard') }}"
+           class="nav-link {{ request()->routeIs('dashboard') ? 'active' : '' }}">
 
-        {{-- COMMON DASHBOARD --}}
+            <i class="fas fa-th-large"></i>
+            <span>Dashboard</span>
+
+        </a>
+
+    </li>
+
+    {{-- ================= ADMIN ================= --}}
+    @if ($user->isAdmin())
+
         <li class="nav-item">
 
-            <a href="{{ url('dashboard') }}"
-               class="nav-link {{ request()->routeIs('dashboard') ? 'active' : '' }}">
+            <a href="{{ route('admin.users') }}" class="nav-link">
 
-                <i class="fas fa-th-large"></i>
-                <span>Dashboard</span>
+                <i class="fas fa-users"></i>
+                <span>Users</span>
 
             </a>
 
         </li>
 
+        <li class="nav-item">
 
+            <a href="{{ route('services.index') }}" class="nav-link">
 
+                <i class="fas fa-tools"></i>
+                <span>Services</span>
 
+            </a>
 
-        {{-- ================= ADMIN ================= --}}
-        @if($user->isAdmin())
+        </li>
 
-            <li class="nav-item">
+    @endif
 
-                <a href="{{ route('admin.users') }}" class="nav-link">
+    {{-- ================= SEEKER ================= --}}
+    @if ($user->isSeeker())
 
-                    <i class="fas fa-users"></i>
-                    <span>All Users</span>
+        <li class="nav-item">
 
-                </a>
+            <a href="{{ route('seeker.profile') }}" class="nav-link">
 
-            </li>
+                <i class="fas fa-user"></i>
+                <span>My Profile</span>
 
-        @endif
+            </a>
 
+        </li>
 
+        <li class="nav-item">
 
+            <a href="{{ route('seeker.services.create') }}" class="nav-link">
 
+                <i class="fas fa-tools"></i>
+                <span>Browse Services</span>
 
-        {{-- ================= SEEKER ================= --}}
-        @if($user->isSeeker())
+            </a>
 
-            {{-- PROFILE --}}
-            <li class="nav-item">
+        </li>
 
-                <a href="{{ route('seeker.profile') }}" class="nav-link">
+        <li class="nav-item">
 
-                    <i class="fas fa-user"></i>
-                    <span>My Profile</span>
+            <a href="{{ route('seeker.requests') }}" class="nav-link">
 
-                </a>
+                <i class="fas fa-clipboard-list"></i>
+                <span>My Requests</span>
 
-            </li>
+            </a>
 
+        </li>
 
+    @endif
 
-            {{-- PRACTICE TAB --}}
-            <li class="nav-item">
+    {{-- ================= PROVIDER ================= --}}
+    @if ($user->isProvider())
 
-                <a href="{{ $seekerCompleted ? route('dashboard') : '#' }}"
-                   class="nav-link {{ !$seekerCompleted ? 'disabled-link' : '' }}">
+        {{-- PROFILE --}}
+        <li class="nav-item">
 
-                    <i class="fas fa-book"></i>
-                    <span>Practice</span>
+            <a href="{{ route('provider.profile') }}" class="nav-link">
 
-                </a>
+                <i class="fas fa-user-check"></i>
+                <span>Provider Profile</span>
 
-            </li>
+            </a>
 
+        </li>
 
+        {{-- REQUESTS --}}
+        <li class="nav-item">
 
-            {{-- OTHER TAB --}}
-            <li class="nav-item">
+            <a href="{{ route('provider.requests') }}" class="nav-link">
 
-                <a href="{{ $seekerCompleted ? route('dashboard') : '#' }}"
-                   class="nav-link {{ !$seekerCompleted ? 'disabled-link' : '' }}">
+                <i class="fas fa-calendar-check"></i>
+                <span>Service Requests</span>
 
-                    <i class="fas fa-briefcase"></i>
-                    <span>Opportunities</span>
+            </a>
 
-                </a>
+        </li>
 
-            </li>
+        {{-- PRACTICE --}}
+        <li class="nav-item">
 
+            <a href="{{ route('dashboard') }}" class="nav-link">
 
+                <i class="fas fa-book-open"></i>
+                <span>Practice</span>
 
-            {{-- WARNING --}}
-            @if(!$seekerCompleted)
+            </a>
 
-                <div class="alert alert-warning mx-2 mt-3 small">
+        </li>
 
-                    Complete 85% profile to unlock features.
+        {{-- SERVICES --}}
+        <li class="nav-item">
 
-                </div>
+            <a href="{{ route('services.index') }}" class="nav-link">
 
-            @endif
+                <i class="fas fa-tools"></i>
+                <span>Services</span>
 
-        @endif
+            </a>
 
+        </li>
 
+    @endif
 
+</ul>
 
+<!-- FOOTER -->
+<div class="sidebar-footer">
 
-        {{-- ================= PROVIDER ================= --}}
-        @if($user->isProvider())
+    <div class="admin-mini">
 
-            {{-- PROVIDER PROFILE --}}
-            <li class="nav-item">
+        <img src="https://ui-avatars.com/api/?name={{ urlencode($user->name) }}"
+             alt="User">
 
-                <a href="{{ route('provider.profile') }}" class="nav-link">
+        <div class="info">
 
-                    <i class="fas fa-user-check"></i>
-                    <span>Provider Profile</span>
+            <div class="name">
+                {{ $user->name }}
+            </div>
 
-                </a>
-
-            </li>
-
-
-
-            {{-- PRACTICE TAB --}}
-            <li class="nav-item">
-
-                <a href="{{ $providerCompleted ? route('dashboard') : '#' }}"
-                   class="nav-link {{ !$providerCompleted ? 'disabled-link' : '' }}">
-
-                    <i class="fas fa-book-open"></i>
-                    <span>Practice</span>
-
-                </a>
-
-            </li>
-
-
-
-            {{-- SERVICES TAB --}}
-            <li class="nav-item">
-
-                <a href="{{ $providerCompleted ? route('dashboard') : '#' }}"
-                   class="nav-link {{ !$providerCompleted ? 'disabled-link' : '' }}">
-
-                    <i class="fas fa-tools"></i>
-                    <span>Services</span>
-
-                </a>
-
-            </li>
-
-
-
-            {{-- REQUESTS TAB --}}
-            <li class="nav-item">
-
-                <a href="{{ $providerCompleted ? route('dashboard') : '#' }}"
-                   class="nav-link {{ !$providerCompleted ? 'disabled-link' : '' }}">
-
-                    <i class="fas fa-calendar-check"></i>
-                    <span>Requests</span>
-
-                </a>
-
-            </li>
-
-
-
-            {{-- WARNING --}}
-            @if(!$providerCompleted)
-
-                <div class="alert alert-warning mx-2 mt-3 small">
-
-                    Complete 85% profile to unlock features.
-
-                </div>
-
-            @endif
-
-        @endif
-
-    </ul>
-
-
-
-
-
-    <!-- FOOTER -->
-    <div class="sidebar-footer">
-
-        <div class="admin-mini">
-
-            <img src="https://ui-avatars.com/api/?name={{ urlencode($user->name) }}"
-                 alt="User">
-
-            <div class="info">
-
-                <div class="name">
-                    {{ $user->name }}
-                </div>
-
-                <div class="role">
-                    {{ ucfirst($user->role) }}
-                </div>
-
+            <div class="role">
+                {{ ucfirst($user->role) }}
             </div>
 
         </div>
 
     </div>
 
+</div>
+
 </aside>
-
-
-
-
-
-<style>
-
-.disabled-link{
-    pointer-events: none;
-    opacity: 0.5;
-    cursor: not-allowed;
-}
-
-</style>

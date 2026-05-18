@@ -1,13 +1,14 @@
 <?php
 
 use App\Http\Controllers\Admin\AdminController;
-
+use App\Http\Controllers\Admin\ServiceController;
 use App\Http\Controllers\Admin\UserVerificationController;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\HomeController;
-
 use App\Http\Controllers\Provider\ProviderProfileController;
+use App\Http\Controllers\Provider\ProviderRequestController;
 use App\Http\Controllers\Seeker\SeekerProfileController;
+use App\Http\Controllers\Seeker\SeekerServiceRequestController;
 use Illuminate\Support\Facades\Route;
 
 
@@ -18,8 +19,6 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
-
-
 
 /*
 |--------------------------------------------------------------------------
@@ -35,22 +34,17 @@ Route::get('/login', [AuthController::class, 'LoginScreen'])
 Route::post('/login', [AuthController::class, 'login'])
     ->name('login.submit');
 
-
 // REGISTER PAGE
 Route::get('/register', [AuthController::class, 'RegisterScreen'])
     ->name('auth.register');
-
 
 // REGISTER FUNCTION
 Route::post('/register/store', [AuthController::class, 'Register'])
     ->name('register.store');
 
-
 // LOGOUT
 Route::post('/logout', [AuthController::class, 'logout'])
     ->name('logout');
-
-
 
 /*
 |--------------------------------------------------------------------------
@@ -59,8 +53,6 @@ Route::post('/logout', [AuthController::class, 'logout'])
 */
 
 Route::middleware(['auth'])->group(function () {
-
-
 
     /*
     |--------------------------------------------------------------------------
@@ -71,32 +63,27 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/dashboard', [AdminController::class, 'dashboard'])
         ->name('dashboard');
 
+    Route::middleware(['auth'])->prefix('admin')->group(function () {
 
-
-Route::middleware(['auth'])->prefix('admin')->group(function () {
-
-Route::get('/users', [UserVerificationController::class, 'index'])->name('admin.users');
-Route::get('/users/{id}', [UserVerificationController::class, 'show'])->name('admin.users.show');
-Route::post('/users/{id}/verify',[UserVerificationController::class, 'verify'])->name('admin.users.verify');
-Route::post('/users/{id}/unverify',[UserVerificationController::class, 'unverify'])->name('admin.users.unverify');
-});
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | SEEKER PROFILE ROUTES
-    |--------------------------------------------------------------------------
-    */
-
-    Route::prefix('seeker')->name('seeker.')->group(function () {
-
-        // PROFILE PAGE
-        Route::get('/profile', [SeekerProfileController::class, 'index'])->name('profile');
-        // STORE / UPDATE PROFILE
-        Route::post('/profile/store', [SeekerProfileController::class, 'store'])->name('profile.store');
+        Route::get('/users', [UserVerificationController::class, 'index'])->name('admin.users');
+        Route::get('/users/{id}', [UserVerificationController::class, 'show'])->name('admin.users.show');
+        Route::post('/users/{id}/verify', [UserVerificationController::class, 'verify'])->name('admin.users.verify');
+        Route::post('/users/{id}/unverify', [UserVerificationController::class, 'unverify'])->name('admin.users.unverify');
     });
 
+    Route::get('/services', [ServiceController::class, 'index'])->name('services.index');
+    Route::post('/services/store', [ServiceController::class, 'store'])->name('services.store');
+    Route::put('/services/update/{id}', [ServiceController::class, 'update'])->name('services.update');
+    Route::delete('/services/delete/{id}', [ServiceController::class, 'destroy'])->name('services.delete');
 
+    // PROFILE PAGE
+    Route::get('/profile', [SeekerProfileController::class, 'index'])->name('seeker.profile');
+    // STORE / UPDATE PROFILE
+    Route::post('/profile/store', [SeekerProfileController::class, 'store'])->name('profile.store');
+
+    Route::get('/seeker/requests/index', [SeekerServiceRequestController::class, 'index'])->name('seeker.requests');
+    Route::get('/seeker/services', [SeekerServiceRequestController::class, 'create'])->name('seeker.services.create');
+    Route::post('/seeker/services/request', [SeekerServiceRequestController::class, 'store'])->name('seeker.services.request');
 
     /*
     |--------------------------------------------------------------------------
@@ -110,5 +97,14 @@ Route::post('/users/{id}/unverify',[UserVerificationController::class, 'unverify
         Route::get('/profile', [ProviderProfileController::class, 'index'])->name('profile');
         // STORE / UPDATE PROFILE
         Route::post('/profile/store', [ProviderProfileController::class, 'store'])->name('profile.store');
+
+
+
+         Route::get('/requests', [ProviderRequestController::class, 'index'])->name('requests');
+
+    Route::get('/requests/{id}', [ProviderRequestController::class, 'show'])->name('requests.show');
+
+    Route::post('/requests/{id}/status', [ProviderRequestController::class, 'updateStatus'])->name('requests.status');
+
     });
 });
